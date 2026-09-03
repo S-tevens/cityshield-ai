@@ -14,51 +14,70 @@ export default function ZoneMap({ zoneState }) {
   }, []);
 
   return (
-    <MapContainer
-      crs={CRS.Simple}
-      bounds={[[0, 0], [200, 200]]}
-      style={{ height: "100%", width: "100%", background: "#0d1117" }}
-      zoomControl={false}
-      attributionControl={false}
-      dragging={false}
-      scrollWheelZoom={false}
-      doubleClickZoom={false}
-      touchZoom={false}
-    >
-      {Object.entries(ZONES).map(([zoneId, zone]) => {
-        const state = zoneState[zoneId];
-        const level = state?.risk_level ?? "unknown";
-        const color = RISK_COLORS[level];
-        const age = state ? Date.now() - state.receivedAt : Infinity;
-        const isFresh = age < FLASH_MS;
+    <div className="map-frame">
+      <div className="map-grid-bg" />
+      <div className="map-scan" />
 
-        return (
-          <Rectangle
-            key={zoneId}
-            bounds={zone.bounds}
-            pathOptions={{
-              color,
-              weight: isFresh ? 4 : 1.5,
-              fillColor: color,
-              fillOpacity: isFresh ? 0.55 : 0.2,
-            }}
-          >
-            <Tooltip direction="center" permanent className="zone-tooltip">
-              <div className="zone-tooltip-inner">
-                <strong>{zone.label}</strong>
-                {state ? (
-                  <>
-                    <div className={`zone-label risk-${level}`}>{state.label}</div>
-                    <div className="zone-score">risk {state.risk_score.toFixed(2)}</div>
-                  </>
-                ) : (
-                  <div className="zone-label">no data yet</div>
-                )}
-              </div>
-            </Tooltip>
-          </Rectangle>
-        );
-      })}
-    </MapContainer>
+      <MapContainer
+        crs={CRS.Simple}
+        bounds={[[0, 0], [200, 200]]}
+        style={{ height: "100%", width: "100%", background: "transparent" }}
+        zoomControl={false}
+        attributionControl={false}
+        dragging={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        touchZoom={false}
+      >
+        {Object.entries(ZONES).map(([zoneId, zone]) => {
+          const state = zoneState[zoneId];
+          const level = state?.risk_level ?? "unknown";
+          const color = RISK_COLORS[level];
+          const age = state ? Date.now() - state.receivedAt : Infinity;
+          const isFresh = age < FLASH_MS;
+
+          return (
+            <Rectangle
+              key={zoneId}
+              bounds={zone.bounds}
+              pathOptions={{
+                color,
+                weight: isFresh ? 4 : 1.5,
+                fillColor: color,
+                fillOpacity: isFresh ? 0.5 : 0.15,
+                className: isFresh ? `zone-flash zone-flash-${level}` : "",
+              }}
+            >
+              <Tooltip direction="center" permanent className="zone-tooltip">
+                <div className="zone-tooltip-inner">
+                  <strong>{zone.label}</strong>
+                  {state ? (
+                    <>
+                      <div className={`zone-label risk-${level}`}>{state.label}</div>
+                      <div className="zone-score">risk {state.risk_score.toFixed(2)}</div>
+                    </>
+                  ) : (
+                    <div className="zone-label">no data yet</div>
+                  )}
+                </div>
+              </Tooltip>
+            </Rectangle>
+          );
+        })}
+      </MapContainer>
+
+      <div className="map-title">Regional Risk Map</div>
+      <div className="map-legend">
+        <span>
+          <i className="legend-dot risk-low" /> low
+        </span>
+        <span>
+          <i className="legend-dot risk-medium" /> medium
+        </span>
+        <span>
+          <i className="legend-dot risk-high" /> high
+        </span>
+      </div>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import { WS_URL, HEALTH_URL, MAX_EVENTS } from "./config.js";
 import ZoneMap from "./components/ZoneMap.jsx";
 import EventFeed from "./components/EventFeed.jsx";
 import StatBar from "./components/StatBar.jsx";
+import Clock from "./components/Clock.jsx";
 
 export default function App() {
   const [events, setEvents] = useState([]);
@@ -46,11 +47,12 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>CityShield AI</h1>
-        <span className="subtitle">Traffic &amp; Emergency Cyber Risk — Live Dashboard</span>
+        <div className="app-title">
+          <h1>CityShield AI</h1>
+          <span className="subtitle">Traffic &amp; Emergency Cyber Risk — Live Dashboard</span>
+        </div>
+        <Clock />
       </header>
-
-      <StatBar connected={connected} health={health} stats={stats} />
 
       <main className="app-main">
         <section className="map-panel">
@@ -60,6 +62,13 @@ export default function App() {
           <EventFeed events={events} />
         </section>
       </main>
+
+      <StatBar
+        connected={connected}
+        health={health}
+        stats={stats}
+        lastEventAt={events[0]?.receivedAt ?? null}
+      />
     </div>
   );
 }

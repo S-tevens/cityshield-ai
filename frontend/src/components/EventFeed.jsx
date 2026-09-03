@@ -1,6 +1,13 @@
 export default function EventFeed({ events }) {
+  const anomalies = events.filter((e) => e.label !== "normal");
+
   return (
     <div className="event-feed">
+      <div className="event-feed-title">
+        <span className="live-dot" />
+        Live Anomaly Feed
+        <span className="event-feed-count">{anomalies.length}</span>
+      </div>
       <div className="event-feed-header">
         <span>Time</span>
         <span>Label</span>
@@ -9,10 +16,10 @@ export default function EventFeed({ events }) {
         <span>Mode</span>
       </div>
       <div className="event-feed-body">
-        {events.length === 0 && (
-          <div className="event-feed-empty">Waiting for events…</div>
+        {anomalies.length === 0 && (
+          <div className="event-feed-empty">No anomalies detected yet — all clear.</div>
         )}
-        {events.map((e) => (
+        {anomalies.map((e) => (
           <div key={e.receivedAt + e.label + e.zone_id} className={`event-row risk-${e.risk_level}`}>
             <span className="event-time">
               {new Date(e.timestamp).toLocaleTimeString()}
